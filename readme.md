@@ -1,4 +1,4 @@
-# Homework 2
+# CS 1538 @Pitt - Simulation - Homework 2
 ## Introduction
 You will implement a general-purpose linear congruential generator (LCG) function. You will compare the LCG using two specific initial settings against the default U[0,1) random number generator supplied by the Random library of your programming language (which may or may not have used a LCG). For each setting, you will generate a stream of pseudo-random numbers in the range [0, 1) (i.e. between 0 and 1, including 0, excluding 1). You should test each stream for uniformity and independence by applying four statistical tests:
 				1.	Kolmogorov-Smirnov Test
