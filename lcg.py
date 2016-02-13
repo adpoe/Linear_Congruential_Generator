@@ -56,6 +56,8 @@ def main():
             generate_lcg( number_observations )
             run_test_suite(test_selection, number_observations)
 
+
+
         # If user selects LCG with RANDU settings
         # create output file, and run the battery of tests
         elif int(test_selection) == 3:
@@ -175,7 +177,7 @@ def generate_lcg( num_iterations ):
 
         # write to output file
         outFile.write(writeValue + "\n")
-        print "num: " + " " + str(counter) +":: " + str(x_value)
+        # print "num: " + " " + str(counter) +":: " + str(x_value)
 
         counter = counter+1
 
@@ -218,7 +220,7 @@ def generate_lcg_RANDU( num_iterations ):
 
         # write to output file
         outFile.write(writeValue + "\n")
-        print "num: " + " " + str(counter) +":: " + str(x_value)
+        # print "num: " + " " + str(counter) +":: " + str(x_value)
 
         counter = counter+1
 
@@ -279,7 +281,7 @@ def chi_square_uniformity_test( data_set, confidence_level, num_samples ):
     # Loop through a dictionary and get every count
     # The observed value is going to be our count at each key, and then we can do chi-square
     for observed_val in data_set:
-        print "Observed value is: " + observed_val
+        # print "Observed value is: " + observed_val
         chi_sq_value += ( pow((expected_val - data_set[observed_val]), 2)/expected_val )
 
     # Coming out of this loop, we'll have a chi-squared test statistic
@@ -419,25 +421,25 @@ def autocorrelation_tests( data_file, num_samples, gap_sequence ):
     while (big_m + 1) < ( (big_n - start_index)/little_m ) :
         big_m = big_m + 1
 
-    print "Final value for big_m: " + str(big_m)
+    # print "Final value for big_m: " + str(big_m)
 
     one_over_m_plus_one = ( 1/(big_m + 1 ) )
     rho_hat = 0
-    sum_of_rho_hat = 0
+    sum_of_rho_hat = 0.0
 
 
     # Get every m'th element in the data_set
     every_m_element = data_points[0::gap_sequence]
 
-    print "Length: " + str(len(every_m_element))
+    # print "Length: " + str(len(every_m_element))
     # Get the sum of rho_hat
     for value in range(0, (len(every_m_element)-1) ):
         thisValue = float(every_m_element[value])
         nextValue = float(every_m_element[value+1])
-        print "Autocorrelation: Ki   :" + str(thisValue)
-        print "Autocorrelation: Ki+1 :" + str(nextValue)
+        # print "Autocorrelation: Ki   :" + str(thisValue)
+        # print "Autocorrelation: Ki+1 :" + str(nextValue)
         sum_of_rho_hat += one_over_m_plus_one * (thisValue + nextValue)
-        print "Sum of rho hat: " + str(sum_of_rho_hat)
+        # print "Sum of rho hat: " + str(sum_of_rho_hat)
 
     # Subtract 0.25
     sum_of_rho_hat = sum_of_rho_hat - 0.25
@@ -446,8 +448,116 @@ def autocorrelation_tests( data_file, num_samples, gap_sequence ):
 
     z_statistic = sum_of_rho_hat / variance_of_rho
 
-    print "Z-Score for autocorrelation is: " + str(z_statistic)
+    # print "Z-Score for autocorrelation is: " + str(z_statistic)
     return z_statistic
+
+
+
+##############################
+##### Significance Tests #####
+##############################
+
+def chi_sq_significance_test( chi_sq, signif_level):
+    """
+    Performs a significance test for df=100, based on values in table A.5 of
+    Discrete-Event System Simulation, by Jerry Banks and John S. Carson, II
+    1984 edition.
+    :param chi_sq:  Chi-sq value to test
+    :param signif_level: Level of significance we are testing: 0.8, 0.95, or 0.99
+    :return: message stating whether we accept or reject null
+    """
+    result = "FAIL TO REJECT null hypothesis"
+    crit_value = 0.0
+    if signif_level == 0.8:
+        crit_value = 118.5
+    elif signif_level == 0.95:
+        crit_value = 124.3
+    elif signif_level == 0.99:
+        crit_value = 135.8
+    else:
+        print "**Invalid Significance Level for Chi Sq***"
+
+    if chi_sq > crit_value:
+        result = "REJECT null hypothesis"
+
+    print "Print Significance Level: " + str(signif_level)
+    print "Chi Sq: " + str(chi_sq)
+    print "Crit Value: " + str(crit_value)
+    print "Result is: " + result
+    print "...................................."
+
+    return result
+
+def ks_significance_test( d_statistic, num_observations, alpha_level ):
+    """
+    Perform Significance test for Kolmogorov-Smirnov
+    Uses formulas from table A.7:  Discrete-Event System Simulation, by Banks and Carson, 1984
+    :param d_statistic: The d-value we are testing
+    :param num_observations: The number of observations in our data set
+    :param alpha_level: The level of significance we are testing
+    :return: result -- accept or reject
+    """
+    result = "FAIL TO REJECT null hypothesis"
+    critical_value = 0
+
+
+    if alpha_level == 0.1:
+        critical_value = 1.22/np.sqrt(num_observations)
+    elif alpha_level == 0.05:
+        critical_value = 1.36/np.sqrt(num_observations)
+    elif alpha_level == 0.01:
+        critical_value = 1.63/np.sqrt(num_observations)
+    else:
+        print "Invalid alpha level for KS test. Must be: 0.1, 0.05, or 0.01"
+
+    if d_statistic > alpha_level:
+        result = "REJECT null hypothesis"
+    print "Alpha Level is: " + str(alpha_level)
+    print "D_statistic is: " + str(d_statistic)
+    print "Critical value is: " + str(critical_value)
+    print "Result is: " + result
+    print "............................"
+
+    return result
+
+def z_score_lookup( z_score, significance_level, two_sided=True):
+    """
+    Performs a two-sided z-score lookup, for 0.8, 0.9, or 0.95 level of significance
+    :param z_score: Z score to test
+    :param significance_level: Significance level
+    :return: String detailing our result
+    """
+
+    result = "REJECT null hypothesis"
+    critical_value = 0.0
+
+    if significance_level == 0.8:
+        critical_value = 1.282
+    elif significance_level == 0.9:
+        critical_value = 1.645
+    elif significance_level == 0.95:
+        critical_value = 1.96
+    else:
+        print "Invalid significance level for z-lookup. Must be: 0.8, 0.9, or 0.95"
+
+    neg_crit_value = critical_value * (-1.0)
+
+    if ( two_sided and (neg_crit_value/2 <= z_score) and (z_score <= critical_value/2) ):
+        result = "FAIL TO REJECT null hypothesis"
+    else:
+        # If false is specified, we do a one-sided z-score
+        if z_score >= critical_value:
+            result = "FAIL TO REJECT null hypothesis"
+
+    print "Z score is: " + str(z_score)
+    print "Significance level is: " + str(significance_level)
+    print "Critical value is: " +str(critical_value)
+    print "Running two sided z-score lookup? -->" + str(two_sided)
+    print ""
+    print "Result is: " + result
+    print "....................................."
+
+    return result
 
 
 
@@ -611,43 +721,100 @@ def run_test_suite( test_selection, number_observations ):
     :return: void - prints to command line
     """
     input_file = ""
+    test_name = ""
     test_selection = int(test_selection)
     if test_selection == 1:
         input_file = "py_random_output.txt"
+        test_name = "PYTHON BUILT-IN RAND"
 
     elif test_selection == 2:
         input_file = "lgc_output.txt"
+        test_name = "LINEAR CONGRUENTIAL GENERATOR"
 
     elif test_selection == 3:
         input_file = "lgc_RANDU_output.txt"
+        test_name = "LGC with RANDU initial settings"
     else:
         print "Invalid input. Please try again."
 
+    print ""
+    print ""
+    print "TEST SUITE FOR:  %s " % (test_name)
+    print "======================================"
+
     # divide our output values in 10 equal subdivisions and run chi-square test
+    print "---------CHI-SQ_TEST-----------"
     data_points = divide_RNG_data_into_10_equal_subdivisions_and_count(input_file)
-    result = chi_square_uniformity_test(data_points, 0, number_observations)
-    print "Result of chi-square = " + str(result)
+    chi_sq_result = chi_square_uniformity_test(data_points, 0, number_observations)
+    chi_sq_significance_test( chi_sq_result, 0.8 )
+    chi_sq_significance_test( chi_sq_result, 0.95 )
+    chi_sq_significance_test( chi_sq_result, 0.99 )
+
+    print ""
 
     # get first 100 values from sample and run kolmogorov-smirnov test
+    print "---------KS_TEST-----------"
     first_100_values = collect_first_100_samples_in_data_set(input_file)
     first_100_values.sort()
     ks_result = kolmogorov_smirnov_test(first_100_values,1,100)
-    print "Kolmogorov-Smirnov Test Result: " + str(ks_result)
+    ks_significance_test(ks_result,100, 0.1)
+    ks_significance_test(ks_result,100, 0.05)
+    ks_significance_test(ks_result,100, 0.01)
+    print "Kolmogorov-Smirnov Test Result for D-Value: " + str(ks_result)
+    print ""
 
     # perform a runs test
-    runs_test_result = runs_test_for_independence(input_file, number_observations )
+    print "---------RUNS_TEST-----------"
+    runs_test_result = runs_test_for_independence( input_file, number_observations )
     print "Runs Test Result Z-Score: " + str(runs_test_result)
+    print ""
+    z_score_lookup(runs_test_result, 0.8, two_sided=True)
+    z_score_lookup(runs_test_result, 0.9, two_sided=True)
+    z_score_lookup(runs_test_result, 0.95, two_sided=True)
+    print ""
 
     # perform an autocorrelation test
+    print "---------AUTO-CORRELATION_TESTS-----------"
     auto_test_result = autocorrelation_tests(input_file, number_observations, 2 )
-    print "Auto-correlation Test Result for gap size=2: " + str(auto_test_result)
-    auto_test_result = autocorrelation_tests(input_file, number_observations, 3 )
-    print "Auto-correlation Test Result for gap size=3: " + str(auto_test_result)
-    auto_test_result = autocorrelation_tests(input_file, number_observations, 5 )
-    print "Auto-correlation Test Result for gap size=5: " + str(auto_test_result)
-    auto_test_result = autocorrelation_tests(input_file, number_observations, 50 )
-    print "Auto-correlation Test Result for gap size=50: " + str(auto_test_result)
+    print "==== Auto-correlation Test Result for GAP SIZE=2:  " + str(auto_test_result)
 
+    z_score_lookup(auto_test_result, 0.8, two_sided=False)
+    z_score_lookup(auto_test_result, 0.9, two_sided=False)
+    z_score_lookup(auto_test_result, 0.95, two_sided=False)
+    print ""
+    print "       ===== END GAPSIZE=2 ====="
+    print ""
+    print ""
+    auto_test_result = autocorrelation_tests(input_file, number_observations, 3 )
+    print "=== Auto-correlation Test Result for GAP SIZE=3: " + str(auto_test_result)
+    z_score_lookup(auto_test_result, 0.8, two_sided=False)
+    z_score_lookup(auto_test_result, 0.9, two_sided=False)
+    z_score_lookup(auto_test_result, 0.95, two_sided=False)
+    print ""
+    print "       ===== END GAPSIZE=3 ====="
+    print ""
+    print ""
+    auto_test_result = autocorrelation_tests(input_file, number_observations, 5 )
+    print " === Auto-correlation Test Result for GAP SIZE=5: " + str(auto_test_result)
+    z_score_lookup(auto_test_result, 0.8, two_sided=False)
+    z_score_lookup(auto_test_result, 0.9, two_sided=False)
+    z_score_lookup(auto_test_result, 0.95, two_sided=False)
+    print ""
+    print "       ===== END GAPSIZE=5 ====="
+    print ""
+    print ""
+    auto_test_result = autocorrelation_tests(input_file, number_observations, 50 )
+    print "Auto-correlation Test Result for GAP SIZE=50: " + str(auto_test_result)
+    z_score_lookup(auto_test_result, 0.8, two_sided=False)
+    z_score_lookup(auto_test_result, 0.9, two_sided=False)
+    z_score_lookup(auto_test_result, 0.95, two_sided=False)
+    print ""
+    print "       ===== END GAPSIZE=50 ====="
+    print ""
+    print ""
+    print ""
+    print "=-=-=-======= END TEST SUITE ======-=-=-=-="
+    print ""
 
 if __name__ == "__main__":
     main()
@@ -657,19 +824,23 @@ if __name__ == "__main__":
 
 """ Write-Up / Analysis
 
-Once you have done all of your tests, you must look over and analyze your results and present them in a well-written, well-formatted report. Your report should include a discussion of the following:
+Once you have done all of your tests, you must look over and analyze your results and present them in a well-written,
+well-formatted report. Your report should include a discussion of the following:
 
 What is the random library function that your compiler supplied for you?
-Summarize the outcomes of the statistical tests for each RNG method in a formatted, easy to understand table. What test(s) did the method "pass"? Be specific about the condition (i.e., at what level of significance).
-For each method, prior to generating the numbers and running the statistical tests, do you expect it to work well or poorly? Explain.
-Looking over some of the generated numbers for each method (but before running the statistical tests), do you think they look sufficiently random? Did the outcome of the statistical test surprise you?
-Discuss whether you think the set of experiments you did for this assignment is sufficient. If so, argue why that is the case. If not, explain what additional test(s) or modification(s) to the methodology you'd perform.
+Summarize the outcomes of the statistical tests for each RNG method in a formatted, easy to understand table.
+What test(s) did the method "pass"? Be specific about the condition (i.e., at what level of significance).
+For each method, prior to generating the numbers and running the statistical tests,
+ do you expect it to work well or poorly? Explain.
+Looking over some of the generated numbers for each method (but before running the statistical tests),
+do you think they look sufficiently random? Did the outcome of the statistical test surprise you?
+Discuss whether you think the set of experiments you did for this assignment is sufficient.
+If so, argue why that is the case. If not, explain what additional test(s) or modification(s) to the methodology you'd perform.
 Submission and Grading:
 
 The assignment is due Wednesday, February 17 by 11:59 pm.
 
 Zip your source code files, your write-up, and your README into one zip file and upload it to CourseWeb, in the Homework 2 location.
-
 For more advice on submitting your assignment, see the Assignments section of the Tips for Success page.
 """""
 
