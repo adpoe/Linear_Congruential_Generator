@@ -847,27 +847,3 @@ if __name__ == "__main__":
 
 
 
-
-""" Write-Up / Analysis
-
-Once you have done all of your tests, you must look over and analyze your results and present them in a well-written,
-well-formatted report. Your report should include a discussion of the following:
-
-What is the random library function that your compiler supplied for you?
-Summarize the outcomes of the statistical tests for each RNG method in a formatted, easy to understand table.
-What test(s) did the method "pass"? Be specific about the condition (i.e., at what level of significance).
-For each method, prior to generating the numbers and running the statistical tests,
- do you expect it to work well or poorly? Explain.
-Looking over some of the generated numbers for each method (but before running the statistical tests),
-do you think they look sufficiently random? Did the outcome of the statistical test surprise you?
-Discuss whether you think the set of experiments you did for this assignment is sufficient.
-If so, argue why that is the case. If not, explain what additional test(s) or modification(s) to the methodology you'd perform.
-Submission and Grading:
-
-The assignment is due Wednesday, February 17 by 11:59 pm.
-
-Zip your source code files, your write-up, and your README into one zip file and upload it to CourseWeb, in the Homework 2 location.
-For more advice on submitting your assignment, see the Assignments section of the Tips for Success page.
-"""""
-
-
