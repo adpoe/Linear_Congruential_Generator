@@ -28,12 +28,6 @@ in-situ below, if needed, any test result will be calculated as expected.
 
 """
 
-
-#
-# Formula to implement X_(i+1) = (aX + c) mod m
-#       where a, c, and m are constants we choose
-
-
 def main():
     # CONTROL FLOW
     print "UNIVERISTY OF PITTSBURGH - SPRING 2016:: CS1538, Assignment #2"
@@ -73,42 +67,6 @@ def main():
         else:
             print "Please select a number from 1 to 3."
 
-
-
-    #   - select a function to generate random numbers
-    #   - how many random numbers to generate
-          # >>> HOW MANY?
-
-    # get num observations, set to 100 for now
-
-
-    # Generate output files
-    # python_rand( number_observations )
-    # generate_lcg( number_observations )
-    # generate_lcg_RANDU( number_observations )
-
-    """
-    # divide our output values in 10 equal subdivisions and run chi-square test
-    data_points = divide_RNG_data_into_10_equal_subdivisions_and_count("lgc_output.txt")
-    result = chi_square_uniformity_test(data_points, 0, number_observations)
-    print "Result of chi-square = " + str(result)
-
-    # get first 100 values from sample and run kolmogorov-smirnov test
-    first_100_values = collect_first_100_samples_in_data_set("lgc_output.txt")
-    first_100_values.sort()
-    ks_result = kolmogorov_smirnov_test(first_100_values,1,100)
-
-    # perform a runs test
-    runs_test_result = runs_test_for_independence("lgc_output.txt", number_observations )
-    print "Runs Test Result Z-Score: " + str(runs_test_result)
-
-    # perform an autocorrelation test
-    auto_test_result = autocorrelation_tests("lgc_output.txt", number_observations, 10 )
-
-    """
-
-    #   - select a statistical test to run
-    #   - save a stream of generate numbers to a file, rather than let them scroll across the screen
 
     # THREE GENERAL FUNCTION SETTINGS
     # Same seed for all cases (seed=123456789)
@@ -844,6 +802,5 @@ def run_test_suite( test_selection, number_observations ):
 
 if __name__ == "__main__":
     main()
-
 
 
